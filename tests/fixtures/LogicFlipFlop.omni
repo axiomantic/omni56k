@@ -1,5 +1,5 @@
 # Nord Modular G2 - LogicFlipFlop (T-Flip-Flop / Toggle Latch)
-# Clean-Room MIT Implementation
+# MIT License
 init:
     state = 0.0
     prevTrig = 0.0

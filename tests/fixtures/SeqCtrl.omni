@@ -1,5 +1,5 @@
 # Nord Modular G2 - SeqCtrl (Control Voltage Step Sequencer)
-# Clean-Room MIT Implementation
+# MIT License
 params:
     val0 {0.2, 0.0, 1.0}
     val1 {0.4, 0.0, 1.0}

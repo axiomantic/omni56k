@@ -1,5 +1,5 @@
 # Nord Modular G2 - Glide (Portamento / Slew Rate Limiter)
-# Clean-Room MIT Implementation
+# MIT License
 params:
     rate {0.05, 0.001, 1.0}
 

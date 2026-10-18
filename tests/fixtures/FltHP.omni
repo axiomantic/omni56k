@@ -1,5 +1,5 @@
 # Nord Modular G2 - FltHP (Chamberlin SVF Highpass Filter with Resonance)
-# Clean-Room MIT Implementation
+# MIT License
 params:
     cutoff {0.5, 0.01, 0.99}
     resonance {0.3, 0.0, 0.98}

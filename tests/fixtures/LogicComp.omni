@@ -1,5 +1,5 @@
 # Nord Modular G2 - LogicComp (Logic Level Comparator)
-# Clean-Room MIT Implementation
+# MIT License
 params:
     threshold {0.5, -1.0, 1.0}
 

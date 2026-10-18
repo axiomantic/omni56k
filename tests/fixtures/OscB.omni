@@ -1,5 +1,5 @@
 # Nord Modular G2 - OscB (Multi-Waveform Oscillator with Mod)
-# Clean-Room MIT Implementation
+# MIT License
 params:
     pitch {0.00458, 0.0, 1.0}
     pw {0.5, 0.01, 0.99}

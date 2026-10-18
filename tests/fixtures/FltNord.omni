@@ -1,5 +1,5 @@
 # Nord Modular G2 - FltNord (Signature 12/24dB Ladder with Saturation)
-# Clean-Room MIT Implementation
+# MIT License
 params:
     cutoff {0.5, 0.01, 0.99}
     resonance {0.5, 0.0, 0.99}

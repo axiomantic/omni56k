@@ -1,5 +1,5 @@
 # Nord Modular G2 - ShaperOverdrive (Non-linear Soft Saturator)
-# Clean-Room MIT Implementation
+# MIT License
 params:
     drive {0.5, 0.0, 1.0}
 

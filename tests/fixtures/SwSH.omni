@@ -1,5 +1,5 @@
 # Nord Modular G2 - SwSH (Sample & Hold)
-# Clean-Room MIT Implementation
+# MIT License
 init:
     held = 0.0
     prevClk = 0.0

@@ -1,5 +1,5 @@
 # Nord Modular G2 - OscA (Dual-Waveform Oscillator)
-# Clean-Room MIT Implementation
+# MIT License
 params:
     pitch {0.00458, 0.0, 1.0}
     waveform {0.0, 0.0, 1.0}

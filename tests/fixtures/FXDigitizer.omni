@@ -1,5 +1,5 @@
 # Nord Modular G2 - FXDigitizer (Bitcrusher / Sample-Rate Reducer)
-# Clean-Room MIT Implementation
+# MIT License
 params:
     bits {0.8, 0.1, 1.0}
     rateReduction {0.25, 0.05, 1.0}

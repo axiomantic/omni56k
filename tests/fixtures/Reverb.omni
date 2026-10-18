@@ -1,5 +1,5 @@
 # Nord Modular G2 - Reverb (Reverberation Processor)
-# Clean-Room MIT Implementation
+# MIT License
 params:
     time {0.7, 0.01, 0.98}
     damp {0.3, 0.0, 1.0}

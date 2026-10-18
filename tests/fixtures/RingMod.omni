@@ -1,5 +1,5 @@
 # Nord Modular G2 - RingMod (Four-Quadrant Balanced Ring Modulator)
-# Clean-Room MIT Implementation
+# MIT License
 params:
     depth {1.0, 0.0, 1.0}
 

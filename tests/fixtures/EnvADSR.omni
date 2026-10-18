@@ -1,5 +1,5 @@
 # Nord Modular G2 - EnvADSR (4-Stage Envelope Generator)
-# Clean-Room MIT Implementation
+# MIT License
 params:
     gate {1.0, 0.0, 1.0}
     attack {0.02, 0.0001, 1.0}

@@ -1,5 +1,5 @@
 # Nord Modular G2 - LogicCounter (Binary / Multi-Step Logic Counter)
-# Clean-Room MIT Implementation
+# MIT License
 params:
     step {0.125, 0.01, 1.0}
 

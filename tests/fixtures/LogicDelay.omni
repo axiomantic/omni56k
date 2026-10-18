@@ -1,5 +1,5 @@
 # Nord Modular G2 - LogicDelay (Logic Pulse Delay & Generator)
-# Clean-Room MIT Implementation
+# MIT License
 params:
     delayLen {0.1, 0.01, 1.0}
     pulseLen {0.05, 0.01, 1.0}

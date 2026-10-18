@@ -1,5 +1,5 @@
 # Nord Modular G2 - OscNoise (White / Pink Noise Generator)
-# Clean-Room MIT Implementation
+# MIT License
 params:
     level {1.0, 0.0, 1.0}
 

@@ -1,5 +1,5 @@
 # Nord Modular G2 - Mxr4_1 (4-to-1 Audio Mixer)
-# Clean-Room MIT Implementation
+# MIT License
 params:
     gain1 {0.25, 0.0, 1.0}
     gain2 {0.25, 0.0, 1.0}

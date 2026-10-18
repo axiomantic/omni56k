@@ -1,5 +1,5 @@
 # Nord Modular G2 - Switch1_2 (1-to-2 Signal Demultiplexer / Router)
-# Clean-Room MIT Implementation
+# MIT License
 params:
     state {0.0, 0.0, 1.0}
 

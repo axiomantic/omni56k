@@ -1,5 +1,5 @@
 # Nord Modular G2 - Pan (Stereo Panner)
-# Clean-Room MIT Implementation
+# MIT License
 params:
     pan {0.5, 0.0, 1.0}
 

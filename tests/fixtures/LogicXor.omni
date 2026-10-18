@@ -1,5 +1,5 @@
 # Nord Modular G2 - LogicXor (Boolean Exclusive-OR Gate)
-# Clean-Room MIT Implementation
+# MIT License
 sample:
     if in1 > 0.5:
         if in2 <= 0.5:

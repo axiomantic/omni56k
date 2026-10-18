@@ -1,5 +1,5 @@
 # Nord Modular G2 - RandomGen (Pseudo-Random Voltage Generator)
-# Clean-Room MIT Implementation
+# MIT License
 params:
     rate {0.5, 0.01, 1.0}
 

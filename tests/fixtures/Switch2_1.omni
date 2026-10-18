@@ -1,5 +1,5 @@
 # Nord Modular G2 - Switch2_1 (2-to-1 Signal Multiplexer / Selector)
-# Clean-Room MIT Implementation
+# MIT License
 params:
     state {0.0, 0.0, 1.0}
 

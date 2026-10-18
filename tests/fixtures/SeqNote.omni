@@ -1,5 +1,5 @@
 # Nord Modular G2 - SeqNote (Step Sequencer Note)
-# Clean-Room MIT Implementation
+# MIT License
 params:
     length {0.25, 0.05, 1.0}
     step0 {0.5, 0.0, 1.0}

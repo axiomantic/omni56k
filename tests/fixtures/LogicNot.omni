@@ -1,5 +1,5 @@
 # Nord Modular G2 - LogicNot (Boolean NOT Inverter)
-# Clean-Room MIT Implementation
+# MIT License
 sample:
     if in1 > 0.5:
         out1 = 0.0

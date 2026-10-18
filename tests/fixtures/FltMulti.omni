@@ -1,5 +1,5 @@
 # Nord Modular G2 - FltMulti (State Variable Multimode Filter)
-# Clean-Room MIT Implementation
+# MIT License
 params:
     mode {0.0, 0.0, 1.0}
     cutoff {0.75, 0.01, 0.99}

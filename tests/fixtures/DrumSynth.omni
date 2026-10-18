@@ -1,5 +1,5 @@
 # Nord Modular G2 - DrumSynth (Percussion & Analog Drum Synthesizer)
-# Clean-Room MIT Implementation
+# MIT License
 params:
     pitch {0.005, 0.0005, 0.05}
     decay {0.15, 0.01, 1.0}
