@@ -1,0 +1,92 @@
+name: ci
+
+on:
+  push:
+    paths-ignore:
+      - '*.md'
+  pull_request:
+    paths-ignore:
+      - '*.md'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  test:
+    name: 'Test (Nim ${{ matrix.nim-version }}, ${{ matrix.os }})'
+    runs-on: ${{ matrix.os }}
+    continue-on-error: ${{ matrix.experimental || false }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            nim-version: '1.6.20'
+          - os: ubuntu-latest
+            nim-version: '2.0.14'
+          - os: ubuntu-latest
+            nim-version: '2.2.12'
+          - os: ubuntu-latest
+            nim-version: 'devel'
+            experimental: true
+          - os: macos-latest
+            nim-version: '2.2.12'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Checkout dsp56300-nim dependency
+        run: |
+          git clone --depth 1 https://github.com/elijahr/dsp56300-nim.git ../dsp56300-nim
+
+      - name: Setup Nim via vfox-nim
+        uses: elijahr/vfox-nim@main
+        with:
+          version: ${{ matrix.nim-version }}
+
+      - name: Cache vfox toolchains
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.version-fox/cache/nim
+            ~/.vfox/cache/nim
+          key: vfox-${{ runner.os }}-${{ matrix.nim-version }}-${{ hashFiles('omnidsp56300.nimble') }}
+          restore-keys: |
+            vfox-${{ runner.os }}-${{ matrix.nim-version }}-
+            vfox-${{ runner.os }}-
+
+      - name: Cache Nimble packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.nimble/pkgs2
+            ~/.nimble/pkgs
+            ~/.nimble/bin
+          key: nimble-${{ runner.os }}-${{ matrix.nim-version }}-${{ hashFiles('omnidsp56300.nimble') }}
+          restore-keys: |
+            nimble-${{ runner.os }}-${{ matrix.nim-version }}-
+            nimble-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: |
+          export PATH="$HOME/.nimble/bin:$PATH"
+          nimble install -Y cligen
+
+      - name: Build CLI binaries
+        run: |
+          nim c -d:release omnidsp56300.nim
+          nim c -d:release omnidsp.nim
+          ./omnidsp56300 --help
+          ./omnidsp --help
+
+      - name: Run test suite
+        run: |
+          export PATH="$HOME/.nimble/bin:$PATH"
+          nimble test

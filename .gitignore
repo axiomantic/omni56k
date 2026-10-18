@@ -1,0 +1,20 @@
+# Nim cache and binaries
+nimcache/
+nimcache
+*.exe
+*.o
+*.a
+*.so
+*.dylib
+*.dll
+*.scx
+*.mxo
+*.pd_darwin
+*.pd_linux
+*.m_amd64
+omnidsp56300
+omnidsp
+test_pipeline
+
+# macOS
+.DS_Store
