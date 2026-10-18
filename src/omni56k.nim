@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import cligen, terminal, os, strutils, parseutils
+import os, strutils, parseutils
 import omni56k/[ast, emitter_asm, emitter_c]
 
 export ast, emitter_asm, emitter_c
@@ -30,17 +30,26 @@ const
   OmniDspVersion* = Omni56kVersion
   version_flag* = "omni56k - version " & Omni56kVersion & "\nMotorola DSP56000 / DSP56300 & C Compiler for the Omni DSL\n(c) 2026 Elijah Shaw-Rutschman"
 
-template printError(msg: string): untyped =
-  setForegroundColor(fgRed)
-  writeStyled("ERROR: ", {styleBright})
-  setForegroundColor(fgWhite, true)
-  writeStyled(msg & "\n")
+when not defined(emscripten) and not defined(wasm32):
+  import cligen, terminal
 
-template printDone(msg: string): untyped =
-  setForegroundColor(fgGreen)
-  writeStyled("SUCCESS: ", {styleBright})
-  setForegroundColor(fgWhite, true)
-  writeStyled(msg & "\n")
+  template printError(msg: string): untyped =
+    setForegroundColor(fgRed)
+    writeStyled("ERROR: ", {styleBright})
+    setForegroundColor(fgWhite, true)
+    writeStyled(msg & "\n")
+
+  template printDone(msg: string): untyped =
+    setForegroundColor(fgGreen)
+    writeStyled("SUCCESS: ", {styleBright})
+    setForegroundColor(fgWhite, true)
+    writeStyled(msg & "\n")
+else:
+  template printError(msg: string): untyped =
+    echo "ERROR: " & msg
+
+  template printDone(msg: string): untyped =
+    echo "SUCCESS: " & msg
 
 proc parseHexOrInt(s: string, defaultVal: uint32): uint32 =
   if s.isEmptyOrWhitespace: return defaultVal
@@ -182,7 +191,7 @@ template omnidsp_main*(
 ): int =
   omni56k_main(files, output, outDir, compileC, snippet, pOrg, paramBase, stateBase, delayBase, scratchBase)
 
-when isMainModule:
+when isMainModule and not defined(emscripten) and not defined(wasm32):
   clCfg.version = version_flag
   clCfg.helpSyntax = ""
   let arguments = "Arguments:\n  Omni file(s) or directory."
