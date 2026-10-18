@@ -7,7 +7,7 @@
 ## 5. Clean C99/C11 generation across all Nord Modular G2 DSP module fixtures
 
 import std/[unittest, strutils, os, tables]
-import omnidsp56300
+import omni56k
 import dsp56300/[state, ir, runner, asm_parser]
 
 let fixturesDir = currentSourcePath().parentDir() / "fixtures"

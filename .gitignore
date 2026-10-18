@@ -12,9 +12,11 @@ nimcache
 *.pd_darwin
 *.pd_linux
 *.m_amd64
-omnidsp56300
-omnidsp
-test_pipeline
+/omni56k
+/omnidsp
+/omnidsp56300
+/test_pipeline
+tests/test_pipeline
 
 # macOS
 .DS_Store

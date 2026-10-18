@@ -21,13 +21,14 @@
 # SOFTWARE.
 
 import cligen, terminal, os, strutils, parseutils
-import omnidsp56300/[ast, emitter_asm, emitter_c]
+import omni56k/[ast, emitter_asm, emitter_c]
 
 export ast, emitter_asm, emitter_c
 
 const
-  OmniDspVersion* = "0.1.0"
-  version_flag* = "omnidsp56300 - version " & OmniDspVersion & "\nMotorola DSP56300 & C Compiler for the Omni DSL\n(c) 2026 Elijah Shaw-Rutschman"
+  Omni56kVersion* = "0.1.0"
+  OmniDspVersion* = Omni56kVersion
+  version_flag* = "omni56k - version " & Omni56kVersion & "\nMotorola DSP56000 / DSP56300 & C Compiler for the Omni DSL\n(c) 2026 Elijah Shaw-Rutschman"
 
 template printError(msg: string): untyped =
   setForegroundColor(fgRed)
@@ -121,7 +122,7 @@ proc compileFile(
   printDone("'" & asmOutName & "' generated to \"" & targetDir & "\".")
   return 0
 
-proc omnidsp_main*(
+proc omni56k_main*(
   files: seq[string],
   output: string = "",
   outDir: string = "",
@@ -167,6 +168,20 @@ proc omnidsp_main*(
 
   return 0
 
+template omnidsp_main*(
+  files: seq[string],
+  output: string = "",
+  outDir: string = "",
+  compileC: bool = false,
+  snippet: bool = false,
+  pOrg: string = "0x0100",
+  paramBase: string = "0x0020",
+  stateBase: string = "0x0000",
+  delayBase: string = "0x0400",
+  scratchBase: string = "0x0300"
+): int =
+  omni56k_main(files, output, outDir, compileC, snippet, pOrg, paramBase, stateBase, delayBase, scratchBase)
+
 when isMainModule:
   clCfg.version = version_flag
   clCfg.helpSyntax = ""
@@ -174,8 +189,8 @@ when isMainModule:
   clCfg.hTabCols = @[clOptKeys, clDflVal, clDescrip]
 
   dispatch(
-    omnidsp_main,
-    cmdName = "omnidsp56300",
+    omni56k_main,
+    cmdName = "omni56k",
     noHdr = true,
     usage = version_flag & "\n\n" & arguments & "\n\nOptions:\n$options",
     short = {

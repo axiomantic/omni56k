@@ -57,7 +57,7 @@ jobs:
           path: |
             ~/.version-fox/cache/nim
             ~/.vfox/cache/nim
-          key: vfox-${{ runner.os }}-${{ matrix.nim-version }}-${{ hashFiles('omnidsp56300.nimble') }}
+          key: vfox-${{ runner.os }}-${{ matrix.nim-version }}-${{ hashFiles('omni56k.nimble') }}
           restore-keys: |
             vfox-${{ runner.os }}-${{ matrix.nim-version }}-
             vfox-${{ runner.os }}-
@@ -69,7 +69,7 @@ jobs:
             ~/.nimble/pkgs2
             ~/.nimble/pkgs
             ~/.nimble/bin
-          key: nimble-${{ runner.os }}-${{ matrix.nim-version }}-${{ hashFiles('omnidsp56300.nimble') }}
+          key: nimble-${{ runner.os }}-${{ matrix.nim-version }}-${{ hashFiles('omni56k.nimble') }}
           restore-keys: |
             nimble-${{ runner.os }}-${{ matrix.nim-version }}-
             nimble-${{ runner.os }}-
@@ -83,7 +83,7 @@ jobs:
         run: |
           export PATH="$HOME/.nimble/bin:$PATH"
           nimble build -Y
-          ./omnidsp56300 --help
+          ./omni56k --help
           ./omnidsp --help
 
       - name: Run test suite

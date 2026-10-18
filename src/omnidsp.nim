@@ -1,9 +1,9 @@
 # MIT License
 # Copyright (c) 2026 Elijah Shaw-Rutschman
-# Alias launcher for omnidsp56300
+# Alias launcher for omni56k
 
 import cligen
-import omnidsp56300
+import omni56k
 
 when isMainModule:
   clCfg.version = version_flag

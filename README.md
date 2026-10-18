@@ -1,15 +1,15 @@
-# omnidsp56300
+# omni56k
 
-**Motorola DSP56300 & C Compiler for the [Omni Audio DSL](https://github.com/vitreo12/omni)**
+**Motorola DSP56000 / DSP56300 & C Compiler for the [Omni Audio DSL](https://github.com/vitreo12/omni)**
 
-[![ci](https://github.com/axiomantic/omnidsp56300/actions/workflows/ci.yml/badge.svg)](https://github.com/axiomantic/omnidsp56300/actions/workflows/ci.yml)
+[![ci](https://github.com/axiomantic/omni56k/actions/workflows/ci.yml/badge.svg)](https://github.com/axiomantic/omni56k/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-`omnidsp56300` compiles standalone `.omni` DSP algorithms into:
-1. **Motorola DSP56300 / DSP56311 24-bit fixed-point Assembly (`.asm`)** for hardware synthesizers and emulators (Access Virus, Nord Modular G2, Waldorf microQ).
+`omni56k` compiles standalone `.omni` DSP algorithms into:
+1. **Motorola DSP56000 / DSP56300 24-bit fixed-point Assembly (`.asm`)** for hardware synthesizers and emulators (Access Virus, Nord Modular G2, Waldorf microQ).
 2. **Self-contained C99/C11 code (`.c`)** for native and WebAssembly (WASM) execution.
 
-Just as [`omnicollider`](https://github.com/vitreo12/omnicollider) compiles Omni code for SuperCollider and [`omnimax`](https://github.com/vitreo12/omnimax) compiles for Max/MSP, `omnidsp56300` is the dedicated backend targeting Motorola DSP56300 hardware.
+Just as [`omnicollider`](https://github.com/vitreo12/omnicollider) compiles Omni code for SuperCollider and [`omnimax`](https://github.com/vitreo12/omnimax) compiles for Max/MSP, `omni56k` is the dedicated backend targeting Motorola 56k DSP hardware.
 
 ---
 
@@ -39,10 +39,10 @@ Just as [`omnicollider`](https://github.com/vitreo12/omnicollider) compiles Omni
 Install using Nimble:
 
 ```bash
-nimble install https://github.com/axiomantic/omnidsp56300 -y
+nimble install https://github.com/axiomantic/omni56k -y
 ```
 
-Both `omnidsp56300` and its alias `omnidsp` will be installed to your `~/.nimble/bin` directory.
+Both `omni56k` and its alias `omnidsp` will be installed to your `~/.nimble/bin` directory.
 
 ---
 
@@ -51,27 +51,27 @@ Both `omnidsp56300` and its alias `omnidsp` will be installed to your `~/.nimble
 ### Compile Omni to Motorola DSP56300 Assembly
 
 ```bash
-omnidsp56300 MyFilter.omni
+omni56k MyFilter.omni
 # Generates MyFilter.asm
 ```
 
 ### Compile Omni to Clean C
 
 ```bash
-omnidsp56300 MyFilter.omni -c
+omni56k MyFilter.omni -c
 # Generates MyFilter.c
 ```
 
 ### Emit Relocatable Firmware Kernel Snippet
 
 ```bash
-omnidsp56300 MyFilter.omni --snippet -o MyFilter_snippet.asm
+omni56k MyFilter.omni --snippet -o MyFilter_snippet.asm
 ```
 
 ### CLI Options
 
 ```
-omnidsp56300 [options] <file(s) or directory>
+omni56k [options] <file(s) or directory>
 
 Options:
   -o=, --output=     ""        Output file path or name (defaults to input file with .asm or .c extension).
@@ -90,7 +90,7 @@ Options:
 
 ## Verification & Testing
 
-`omnidsp56300` includes a test suite with 50+ Nord Modular G2 DSP module fixtures tested directly against the [dsp56300-nim](https://github.com/elijahr/dsp56300-nim) hardware simulation core:
+`omni56k` includes a test suite with 50+ Nord Modular G2 DSP module fixtures tested directly against the [dsp56300-nim](https://github.com/elijahr/dsp56300-nim) hardware simulation core:
 
 ```bash
 nimble test
