@@ -7,3 +7,5 @@ elif dirExists(thisDir() / "../../../dsp56300-nim/src"):
   switch("path", thisDir() / "../../../dsp56300-nim/src")
 elif dirExists(thisDir() / "../../dsp56300-nim/src"):
   switch("path", thisDir() / "../../dsp56300-nim/src")
+
+switch("path", thisDir() / "../src")

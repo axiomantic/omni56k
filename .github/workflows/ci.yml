@@ -81,8 +81,8 @@ jobs:
 
       - name: Build CLI binaries
         run: |
-          nim c -d:release omnidsp56300.nim
-          nim c -d:release omnidsp.nim
+          export PATH="$HOME/.nimble/bin:$PATH"
+          nimble build -Y
           ./omnidsp56300 --help
           ./omnidsp --help
 

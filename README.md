@@ -107,4 +107,4 @@ Tested modules include:
 
 ## License
 
-MIT License. Copyright (c) 2026 Axiomantic & Omni Contributors.
+MIT License. Copyright (c) 2026 Elijah Shaw-Rutschman.

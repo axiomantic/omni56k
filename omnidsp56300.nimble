@@ -1,9 +1,10 @@
 # Package
 
 version       = "0.1.0"
-author        = "Axiomantic & Omni Contributors"
+author        = "Elijah Shaw-Rutschman"
 description   = "Motorola DSP56300 / DSP56311 24-bit fixed-point assembly and C code generator for the Omni DSL"
 license       = "MIT"
+srcDir        = "src"
 bin           = @["omnidsp56300", "omnidsp"]
 
 # Dependencies

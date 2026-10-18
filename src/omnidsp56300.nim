@@ -1,6 +1,6 @@
 # MIT License
 # 
-# Copyright (c) 2026 Axiomantic & Omni Contributors
+# Copyright (c) 2026 Elijah Shaw-Rutschman & Omni Contributors
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -21,11 +21,13 @@
 # SOFTWARE.
 
 import cligen, terminal, os, strutils, parseutils
-import omni_ast, omni_dsp56300, omni_c
+import omnidsp56300/[ast, emitter_asm, emitter_c]
+
+export ast, emitter_asm, emitter_c
 
 const
-  OmniDspVersion = "0.1.0"
-  version_flag = "omnidsp56300 - version " & OmniDspVersion & "\nMotorola DSP56300 & C Compiler for the Omni DSL\n(c) 2026 Axiomantic"
+  OmniDspVersion* = "0.1.0"
+  version_flag* = "omnidsp56300 - version " & OmniDspVersion & "\nMotorola DSP56300 & C Compiler for the Omni DSL\n(c) 2026 Elijah Shaw-Rutschman"
 
 template printError(msg: string): untyped =
   setForegroundColor(fgRed)
@@ -119,7 +121,7 @@ proc compileFile(
   printDone("'" & asmOutName & "' generated to \"" & targetDir & "\".")
   return 0
 
-proc omnidsp_main(
+proc omnidsp_main*(
   files: seq[string],
   output: string = "",
   outDir: string = "",
