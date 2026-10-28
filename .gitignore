@@ -1,12 +1,12 @@
 # Nim cache and binaries
 nimcache/
-nimcache
 *.exe
-*.o
-*.a
+*.out
+*.dll
 *.so
 *.dylib
-*.dll
+*.o
+*.a
 *.scx
 *.mxo
 *.pd_darwin
@@ -18,5 +18,13 @@ nimcache
 /test_pipeline
 tests/test_pipeline
 
-# macOS
+# Polyform & Nimble
+nimblecache/
+.nimble/
+htmldocs/
+site/
 .DS_Store
+.idea/
+.vscode/
+*.swp
+justfile.local

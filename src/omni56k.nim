@@ -28,7 +28,9 @@ export ast, emitter_asm, emitter_c
 const
   Omni56kVersion* = "0.1.0"
   OmniDspVersion* = Omni56kVersion
-  version_flag* = "omni56k - version " & Omni56kVersion & "\nMotorola DSP56000 / DSP56300 & C Compiler for the Omni DSL\n(c) 2026 Elijah Shaw-Rutschman"
+  version_flag* =
+    "omni56k - version " & Omni56kVersion &
+    "\nMotorola DSP56000 / DSP56300 & C Compiler for the Omni DSL\n(c) 2026 Elijah Shaw-Rutschman"
 
 when not defined(emscripten) and not defined(wasm32):
   import cligen, terminal
@@ -44,6 +46,7 @@ when not defined(emscripten) and not defined(wasm32):
     writeStyled("SUCCESS: ", {styleBright})
     setForegroundColor(fgWhite, true)
     writeStyled(msg & "\n")
+
 else:
   template printError(msg: string): untyped =
     echo "ERROR: " & msg
@@ -52,12 +55,13 @@ else:
     echo "SUCCESS: " & msg
 
 proc parseHexOrInt(s: string, defaultVal: uint32): uint32 =
-  if s.isEmptyOrWhitespace: return defaultVal
+  if s.isEmptyOrWhitespace:
+    return defaultVal
   var clean = s.strip()
   if clean.startsWith("$"):
-    clean = clean[1..^1]
+    clean = clean[1 ..^ 1]
   elif clean.startsWith("0x") or clean.startsWith("0X"):
-    clean = clean[2..^1]
+    clean = clean[2 ..^ 1]
   var val: uint64 = 0
   if parseHex(clean, val) > 0:
     return uint32(val)
@@ -67,16 +71,16 @@ proc parseHexOrInt(s: string, defaultVal: uint32): uint32 =
     return defaultVal
 
 proc compileFile(
-  fileFullPath: string,
-  outName: string = "",
-  outDir: string = "",
-  compileC: bool = false,
-  snippet: bool = false,
-  pOrg: string = "0x0100",
-  paramBase: string = "0x0020",
-  stateBase: string = "0x0000",
-  delayBase: string = "0x0400",
-  scratchBase: string = "0x0300"
+    fileFullPath: string,
+    outName: string = "",
+    outDir: string = "",
+    compileC: bool = false,
+    snippet: bool = false,
+    pOrg: string = "0x0100",
+    paramBase: string = "0x0020",
+    stateBase: string = "0x0000",
+    delayBase: string = "0x0400",
+    scratchBase: string = "0x0300",
 ): int =
   if not fileFullPath.fileExists():
     printError("File '" & fileFullPath & "' does not exist.")
@@ -88,7 +92,8 @@ proc compileFile(
     return 1
 
   var targetDir = if outDir != "": outDir else: dir
-  if targetDir == "": targetDir = getCurrentDir()
+  if targetDir == "":
+    targetDir = getCurrentDir()
   targetDir = targetDir.normalizedPath().expandTilde().absolutePath()
 
   if not dirExists(targetDir):
@@ -103,7 +108,11 @@ proc compileFile(
 
   if compileC:
     let cCode = emitC(m)
-    var cOutName = if outName != "": outName else: name & ".c"
+    var cOutName =
+      if outName != "":
+        outName
+      else:
+        name & ".c"
     if not cOutName.endsWith(".c"):
       cOutName.add(".c")
     let targetPath = targetDir / cOutName
@@ -118,12 +127,17 @@ proc compileFile(
   addrs.delayBase = parseHexOrInt(delayBase, 0x0400'u32)
   addrs.scratchBase = parseHexOrInt(scratchBase, 0x0300'u32)
 
-  let asmCode = if snippet:
-    compileOmniSnippet(m, addrs, m.name, stageAll)
-  else:
-    emitDsp56300Asm(m)
+  let asmCode =
+    if snippet:
+      compileOmniSnippet(m, addrs, m.name, stageAll)
+    else:
+      emitDsp56300Asm(m)
 
-  var asmOutName = if outName != "": outName else: name & ".asm"
+  var asmOutName =
+    if outName != "":
+      outName
+    else:
+      name & ".asm"
   if not asmOutName.endsWith(".asm"):
     asmOutName.add(".asm")
   let targetPath = targetDir / asmOutName
@@ -132,16 +146,16 @@ proc compileFile(
   return 0
 
 proc omni56k_main*(
-  files: seq[string],
-  output: string = "",
-  outDir: string = "",
-  compileC: bool = false,
-  snippet: bool = false,
-  pOrg: string = "0x0100",
-  paramBase: string = "0x0020",
-  stateBase: string = "0x0000",
-  delayBase: string = "0x0400",
-  scratchBase: string = "0x0300"
+    files: seq[string],
+    output: string = "",
+    outDir: string = "",
+    compileC: bool = false,
+    snippet: bool = false,
+    pOrg: string = "0x0100",
+    paramBase: string = "0x0020",
+    stateBase: string = "0x0000",
+    delayBase: string = "0x0400",
+    scratchBase: string = "0x0300",
 ): int =
   if files.len == 0:
     echo version_flag
@@ -162,15 +176,23 @@ proc omni56k_main*(
   for f in files:
     let full = f.normalizedPath().expandTilde().absolutePath()
     if fileExists(full):
-      let res = compileFile(full, effOutName, effOutDir, compileC, snippet, pOrg, paramBase, stateBase, delayBase, scratchBase)
-      if res != 0: return res
+      let res = compileFile(
+        full, effOutName, effOutDir, compileC, snippet, pOrg, paramBase, stateBase,
+        delayBase, scratchBase,
+      )
+      if res != 0:
+        return res
     elif dirExists(full):
       for kind, entry in walkDir(full):
         if kind == pcFile:
           let ext = entry.splitFile.ext
           if ext == ".omni" or ext == ".oi":
-            let res = compileFile(entry, "", effOutDir, compileC, snippet, pOrg, paramBase, stateBase, delayBase, scratchBase)
-            if res != 0: return res
+            let res = compileFile(
+              entry, "", effOutDir, compileC, snippet, pOrg, paramBase, stateBase,
+              delayBase, scratchBase,
+            )
+            if res != 0:
+              return res
     else:
       printError("Input '" & f & "' does not exist.")
       return 1
@@ -178,18 +200,21 @@ proc omni56k_main*(
   return 0
 
 template omnidsp_main*(
-  files: seq[string],
-  output: string = "",
-  outDir: string = "",
-  compileC: bool = false,
-  snippet: bool = false,
-  pOrg: string = "0x0100",
-  paramBase: string = "0x0020",
-  stateBase: string = "0x0000",
-  delayBase: string = "0x0400",
-  scratchBase: string = "0x0300"
+    files: seq[string],
+    output: string = "",
+    outDir: string = "",
+    compileC: bool = false,
+    snippet: bool = false,
+    pOrg: string = "0x0100",
+    paramBase: string = "0x0020",
+    stateBase: string = "0x0000",
+    delayBase: string = "0x0400",
+    scratchBase: string = "0x0300",
 ): int =
-  omni56k_main(files, output, outDir, compileC, snippet, pOrg, paramBase, stateBase, delayBase, scratchBase)
+  omni56k_main(
+    files, output, outDir, compileC, snippet, pOrg, paramBase, stateBase, delayBase,
+    scratchBase,
+  )
 
 when isMainModule and not defined(emscripten) and not defined(wasm32):
   clCfg.version = version_flag
@@ -202,23 +227,20 @@ when isMainModule and not defined(emscripten) and not defined(wasm32):
     cmdName = "omni56k",
     noHdr = true,
     usage = version_flag & "\n\n" & arguments & "\n\nOptions:\n$options",
-    short = {
-      "version": 'v',
-      "output": 'o',
-      "compileC": 'c',
-      "snippet": 's'
-    },
+    short = {"version": 'v', "output": 'o', "compileC": 'c', "snippet": 's'},
     help = {
       "help": "CLIGEN-NOHELP",
       "version": "CLIGEN-NOHELP",
-      "output": "Output file path or name (defaults to input file with .asm or .c extension).",
+      "output":
+        "Output file path or name (defaults to input file with .asm or .c extension).",
       "outDir": "Output directory folder.",
       "compileC": "Emit self-contained C code (.c) instead of DSP56300 assembly.",
-      "snippet": "Emit relocatable DSP56300 kernel snippet without ORG headers or symbol declarations.",
+      "snippet":
+        "Emit relocatable DSP56300 kernel snippet without ORG headers or symbol declarations.",
       "pOrg": "Program memory execution address in P: (default 0x0100).",
       "paramBase": "Parameter base address in X: (default 0x0020).",
       "stateBase": "State variables base address in Y: (default 0x0000).",
       "delayBase": "Circular delay buffer base address in Y: (default 0x0400).",
-      "scratchBase": "Temporary scratch base address in Y: (default 0x0300)."
-    }
+      "scratchBase": "Temporary scratch base address in Y: (default 0x0300).",
+    },
   )
