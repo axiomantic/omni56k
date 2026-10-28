@@ -1,11 +1,12 @@
 # Package
 
-version       = "0.1.0"
-author        = "Elijah Shaw-Rutschman"
-description   = "Motorola DSP56000 / DSP56300 24-bit fixed-point assembly and C code generator for the Omni DSL"
-license       = "MIT"
-srcDir        = "src"
-bin           = @["omni56k", "omnidsp"]
+version = "0.1.0"
+author = "Elijah Shaw-Rutschman"
+description =
+  "Motorola DSP56000 / DSP56300 24-bit fixed-point assembly and C code generator for the Omni DSL"
+license = "MIT"
+srcDir = "src"
+bin = @["omni56k", "omnidsp"]
 
 # Dependencies
 

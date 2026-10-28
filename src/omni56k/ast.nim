@@ -23,12 +23,12 @@ type
     initVal*: float
 
   ExprKind* = enum
-    ekNum,      # Numeric literal: 1.0, 440, 0.5
-    ekSym,      # Symbol / variable: in1, cutoff, phase
-    ekUnary,    # Unary operator: -, not
-    ekBinary,   # Binary operator: +, -, *, /, %, <, >, <=, >=, ==, !=, and, or
-    ekCall,     # Function call: sin(x), pow(a, b), abs(x), tanh(x), etc.
-    ekIf        # Inline ternary: if <cond>: <thenExpr> else: <elseExpr>
+    ekNum # Numeric literal: 1.0, 440, 0.5
+    ekSym # Symbol / variable: in1, cutoff, phase
+    ekUnary # Unary operator: -, not
+    ekBinary # Binary operator: +, -, *, /, %, <, >, <=, >=, ==, !=, and, or
+    ekCall # Function call: sin(x), pow(a, b), abs(x), tanh(x), etc.
+    ekIf # Inline ternary: if <cond>: <thenExpr> else: <elseExpr>
 
   Expr* = ref object
     case kind*: ExprKind
@@ -51,16 +51,16 @@ type
       ifCond*, ifThen*, ifElse*: Expr
 
   StmtKind* = enum
-    skAssign,
-    skIf,
-    skWhile,
+    skAssign
+    skIf
+    skWhile
     skExpr
 
   Stmt* = ref object
     case kind*: StmtKind
     of skAssign:
       target*: string
-      assignOp*: string  # "=", "+=", "-=", "*=", "/="
+      assignOp*: string # "=", "+=", "-=", "*=", "/="
       val*: Expr
     of skIf:
       cond*: Expr
@@ -86,19 +86,55 @@ type
 
 type
   TokenKind* = enum
-    tkEof,
-    tkIdent,
-    tkNumber,
-    tkPlus, tkMinus, tkStar, tkSlash, tkPercent,
-    tkAmp, tkPipe, tkCaret,
-    tkAssign, tkPlusAssign, tkMinusAssign, tkStarAssign, tkSlashAssign,
-    tkEq, tkNeq, tkLt, tkLe, tkGt, tkGe,
-    tkLParen, tkRParen, tkLBrace, tkRBrace, tkLBracket, tkRBracket,
-    tkColon, tkComma, tkDot,
-    # Keywords
-    kwIf, kwElif, kwElse, kwWhile, kwFor, kwIn,
-    kwAnd, kwOr, kwNot, kwXor, kwTrue, kwFalse,
-    kwIns, kwOuts, kwParams, kwInit, kwPerform, kwSample
+    tkEof
+    tkIdent
+    tkNumber
+    tkPlus
+    tkMinus
+    tkStar
+    tkSlash
+    tkPercent
+    tkAmp
+    tkPipe
+    tkCaret
+    tkAssign
+    tkPlusAssign
+    tkMinusAssign
+    tkStarAssign
+    tkSlashAssign
+    tkEq
+    tkNeq
+    tkLt
+    tkLe
+    tkGt
+    tkGe
+    tkLParen
+    tkRParen
+    tkLBrace
+    tkRBrace
+    tkLBracket
+    tkRBracket
+    tkColon
+    tkComma
+    tkDot # Keywords
+    kwIf
+    kwElif
+    kwElse
+    kwWhile
+    kwFor
+    kwIn
+    kwAnd
+    kwOr
+    kwNot
+    kwXor
+    kwTrue
+    kwFalse
+    kwIns
+    kwOuts
+    kwParams
+    kwInit
+    kwPerform
+    kwSample
 
   Token* = object
     kind*: TokenKind
@@ -115,10 +151,10 @@ type
     tokens*: seq[Token]
 
 proc isIdentStart(c: char): bool =
-  c in {'a'..'z', 'A'..'Z', '_'}
+  c in {'a' .. 'z', 'A' .. 'Z', '_'}
 
 proc isIdentPart(c: char): bool =
-  c in {'a'..'z', 'A'..'Z', '0'..'9', '_'}
+  c in {'a' .. 'z', 'A' .. 'Z', '0' .. '9', '_'}
 
 proc tokenizeLine(rawLine: string, lineNum: int): IndentedLine =
   result.lineNum = lineNum
@@ -148,30 +184,38 @@ proc tokenizeLine(rawLine: string, lineNum: int): IndentedLine =
       continue
 
     # Comments: # or // or ;
-    if c == '#' or c == ';' or (c == '/' and i + 1 < rawLine.len and rawLine[i+1] == '/'):
+    if c == '#' or c == ';' or
+        (c == '/' and i + 1 < rawLine.len and rawLine[i + 1] == '/'):
       break # Rest of line is comment
 
     let col = i + 1
 
     # Numbers (including hex 0x...)
-    if c in {'0'..'9'} or (c == '.' and i + 1 < rawLine.len and rawLine[i+1] in {'0'..'9'}):
+    if c in {'0' .. '9'} or
+        (c == '.' and i + 1 < rawLine.len and rawLine[i + 1] in {'0' .. '9'}):
       let start = i
       var isHex = false
-      if c == '0' and i + 1 < rawLine.len and (rawLine[i+1] == 'x' or rawLine[i+1] == 'X'):
+      if c == '0' and i + 1 < rawLine.len and
+          (rawLine[i + 1] == 'x' or rawLine[i + 1] == 'X'):
         isHex = true
         i += 2
-        while i < rawLine.len and rawLine[i] in {'0'..'9', 'a'..'f', 'A'..'F'}:
+        while i < rawLine.len and rawLine[i] in {'0' .. '9', 'a' .. 'f', 'A' .. 'F'}:
           i += 1
       else:
-        while i < rawLine.len and (rawLine[i] in {'0'..'9', '.'} or rawLine[i] in {'e', 'E', '+', '-'} and i > start and rawLine[i-1] in {'e', 'E'}):
+        while i < rawLine.len and (
+          rawLine[i] in {'0' .. '9', '.'} or
+          rawLine[i] in {'e', 'E', '+', '-'} and i > start and
+          rawLine[i - 1] in {'e', 'E'}
+        )
+        :
           i += 1
-      let numStr = rawLine[start..<i]
+      let numStr = rawLine[start ..< i]
       var val = 0.0
       var isInt = false
       var intVal: int32 = 0
       if isHex:
         try:
-          let h = parseHexInt(numStr[2..^1])
+          let h = parseHexInt(numStr[2 ..^ 1])
           val = float(h)
           intVal = int32(h)
           isInt = true
@@ -189,7 +233,17 @@ proc tokenizeLine(rawLine: string, lineNum: int): IndentedLine =
           except ValueError:
             discard parseFloat(numStr, val)
             isInt = false
-      result.tokens.add(Token(kind: tkNumber, strVal: numStr, numVal: val, isInt: isInt, intVal: intVal, line: lineNum, col: col))
+      result.tokens.add(
+        Token(
+          kind: tkNumber,
+          strVal: numStr,
+          numVal: val,
+          isInt: isInt,
+          intVal: intVal,
+          line: lineNum,
+          col: col,
+        )
+      )
       continue
 
     # Identifiers and keywords
@@ -197,84 +251,140 @@ proc tokenizeLine(rawLine: string, lineNum: int): IndentedLine =
       let start = i
       while i < rawLine.len and isIdentPart(rawLine[i]):
         i += 1
-      let ident = rawLine[start..<i]
+      let ident = rawLine[start ..< i]
       var kind = tkIdent
       case ident
-      of "if": kind = kwIf
-      of "elif": kind = kwElif
-      of "else": kind = kwElse
-      of "while": kind = kwWhile
-      of "for": kind = kwFor
-      of "in": kind = kwIn
-      of "and": kind = kwAnd
-      of "or": kind = kwOr
-      of "xor": kind = kwXor
-      of "not": kind = kwNot
-      of "true", "True": kind = kwTrue
-      of "false", "False": kind = kwFalse
-      of "ins": kind = kwIns
-      of "outs": kind = kwOuts
-      of "params": kind = kwParams
-      of "init": kind = kwInit
-      of "perform": kind = kwPerform
-      of "sample": kind = kwSample
-      else: discard
+      of "if":
+        kind = kwIf
+      of "elif":
+        kind = kwElif
+      of "else":
+        kind = kwElse
+      of "while":
+        kind = kwWhile
+      of "for":
+        kind = kwFor
+      of "in":
+        kind = kwIn
+      of "and":
+        kind = kwAnd
+      of "or":
+        kind = kwOr
+      of "xor":
+        kind = kwXor
+      of "not":
+        kind = kwNot
+      of "true", "True":
+        kind = kwTrue
+      of "false", "False":
+        kind = kwFalse
+      of "ins":
+        kind = kwIns
+      of "outs":
+        kind = kwOuts
+      of "params":
+        kind = kwParams
+      of "init":
+        kind = kwInit
+      of "perform":
+        kind = kwPerform
+      of "sample":
+        kind = kwSample
+      else:
+        discard
 
       result.tokens.add(Token(kind: kind, strVal: ident, line: lineNum, col: col))
       continue
 
     # Multi-character operators
     if i + 1 < rawLine.len:
-      let pair = rawLine[i .. i+1]
+      let pair = rawLine[i .. i + 1]
       case pair
       of "==":
         result.tokens.add(Token(kind: tkEq, strVal: "==", line: lineNum, col: col))
-        i += 2; continue
+        i += 2
+        continue
       of "!=":
         result.tokens.add(Token(kind: tkNeq, strVal: "!=", line: lineNum, col: col))
-        i += 2; continue
+        i += 2
+        continue
       of "<=":
         result.tokens.add(Token(kind: tkLe, strVal: "<=", line: lineNum, col: col))
-        i += 2; continue
+        i += 2
+        continue
       of ">=":
         result.tokens.add(Token(kind: tkGe, strVal: ">=", line: lineNum, col: col))
-        i += 2; continue
+        i += 2
+        continue
       of "+=":
-        result.tokens.add(Token(kind: tkPlusAssign, strVal: "+=", line: lineNum, col: col))
-        i += 2; continue
+        result.tokens.add(
+          Token(kind: tkPlusAssign, strVal: "+=", line: lineNum, col: col)
+        )
+        i += 2
+        continue
       of "-=":
-        result.tokens.add(Token(kind: tkMinusAssign, strVal: "-=", line: lineNum, col: col))
-        i += 2; continue
+        result.tokens.add(
+          Token(kind: tkMinusAssign, strVal: "-=", line: lineNum, col: col)
+        )
+        i += 2
+        continue
       of "*=":
-        result.tokens.add(Token(kind: tkStarAssign, strVal: "*=", line: lineNum, col: col))
-        i += 2; continue
+        result.tokens.add(
+          Token(kind: tkStarAssign, strVal: "*=", line: lineNum, col: col)
+        )
+        i += 2
+        continue
       of "/=":
-        result.tokens.add(Token(kind: tkSlashAssign, strVal: "/=", line: lineNum, col: col))
-        i += 2; continue
-      else: discard
+        result.tokens.add(
+          Token(kind: tkSlashAssign, strVal: "/=", line: lineNum, col: col)
+        )
+        i += 2
+        continue
+      else:
+        discard
 
     # Single-character tokens
     case c
-    of '+': result.tokens.add(Token(kind: tkPlus, strVal: "+", line: lineNum, col: col))
-    of '-': result.tokens.add(Token(kind: tkMinus, strVal: "-", line: lineNum, col: col))
-    of '*': result.tokens.add(Token(kind: tkStar, strVal: "*", line: lineNum, col: col))
-    of '/': result.tokens.add(Token(kind: tkSlash, strVal: "/", line: lineNum, col: col))
-    of '%': result.tokens.add(Token(kind: tkPercent, strVal: "%", line: lineNum, col: col))
-    of '&': result.tokens.add(Token(kind: tkAmp, strVal: "&", line: lineNum, col: col))
-    of '|': result.tokens.add(Token(kind: tkPipe, strVal: "|", line: lineNum, col: col))
-    of '^': result.tokens.add(Token(kind: tkCaret, strVal: "^", line: lineNum, col: col))
-    of '=': result.tokens.add(Token(kind: tkAssign, strVal: "=", line: lineNum, col: col))
-    of '<': result.tokens.add(Token(kind: tkLt, strVal: "<", line: lineNum, col: col))
-    of '>': result.tokens.add(Token(kind: tkGt, strVal: ">", line: lineNum, col: col))
-    of '(': result.tokens.add(Token(kind: tkLParen, strVal: "(", line: lineNum, col: col))
-    of ')': result.tokens.add(Token(kind: tkRParen, strVal: ")", line: lineNum, col: col))
-    of '{': result.tokens.add(Token(kind: tkLBrace, strVal: "{", line: lineNum, col: col))
-    of '}': result.tokens.add(Token(kind: tkRBrace, strVal: "}", line: lineNum, col: col))
-    of '[': result.tokens.add(Token(kind: tkLBracket, strVal: "[", line: lineNum, col: col))
-    of ']': result.tokens.add(Token(kind: tkRBracket, strVal: "]", line: lineNum, col: col))
-    of ':': result.tokens.add(Token(kind: tkColon, strVal: ":", line: lineNum, col: col))
-    of ',': result.tokens.add(Token(kind: tkComma, strVal: ",", line: lineNum, col: col))
-    of '.': result.tokens.add(Token(kind: tkDot, strVal: ".", line: lineNum, col: col))
+    of '+':
+      result.tokens.add(Token(kind: tkPlus, strVal: "+", line: lineNum, col: col))
+    of '-':
+      result.tokens.add(Token(kind: tkMinus, strVal: "-", line: lineNum, col: col))
+    of '*':
+      result.tokens.add(Token(kind: tkStar, strVal: "*", line: lineNum, col: col))
+    of '/':
+      result.tokens.add(Token(kind: tkSlash, strVal: "/", line: lineNum, col: col))
+    of '%':
+      result.tokens.add(Token(kind: tkPercent, strVal: "%", line: lineNum, col: col))
+    of '&':
+      result.tokens.add(Token(kind: tkAmp, strVal: "&", line: lineNum, col: col))
+    of '|':
+      result.tokens.add(Token(kind: tkPipe, strVal: "|", line: lineNum, col: col))
+    of '^':
+      result.tokens.add(Token(kind: tkCaret, strVal: "^", line: lineNum, col: col))
+    of '=':
+      result.tokens.add(Token(kind: tkAssign, strVal: "=", line: lineNum, col: col))
+    of '<':
+      result.tokens.add(Token(kind: tkLt, strVal: "<", line: lineNum, col: col))
+    of '>':
+      result.tokens.add(Token(kind: tkGt, strVal: ">", line: lineNum, col: col))
+    of '(':
+      result.tokens.add(Token(kind: tkLParen, strVal: "(", line: lineNum, col: col))
+    of ')':
+      result.tokens.add(Token(kind: tkRParen, strVal: ")", line: lineNum, col: col))
+    of '{':
+      result.tokens.add(Token(kind: tkLBrace, strVal: "{", line: lineNum, col: col))
+    of '}':
+      result.tokens.add(Token(kind: tkRBrace, strVal: "}", line: lineNum, col: col))
+    of '[':
+      result.tokens.add(Token(kind: tkLBracket, strVal: "[", line: lineNum, col: col))
+    of ']':
+      result.tokens.add(Token(kind: tkRBracket, strVal: "]", line: lineNum, col: col))
+    of ':':
+      result.tokens.add(Token(kind: tkColon, strVal: ":", line: lineNum, col: col))
+    of ',':
+      result.tokens.add(Token(kind: tkComma, strVal: ",", line: lineNum, col: col))
+    of '.':
+      result.tokens.add(Token(kind: tkDot, strVal: ".", line: lineNum, col: col))
     else:
       discard # Skip unknown characters
     i += 1
@@ -288,24 +398,27 @@ proc tokenizeSource*(text: string): seq[IndentedLine] =
       continue
     if parenDepth > 0 and result.len > 0:
       for tok in il.tokens:
-        if tok.kind == tkLParen: inc parenDepth
-        elif tok.kind == tkRParen: dec parenDepth
+        if tok.kind == tkLParen:
+          inc parenDepth
+        elif tok.kind == tkRParen:
+          dec parenDepth
         result[^1].tokens.add(tok)
     else:
       var lineDepth = 0
       for tok in il.tokens:
-        if tok.kind == tkLParen: inc lineDepth
-        elif tok.kind == tkRParen: dec lineDepth
+        if tok.kind == tkLParen:
+          inc lineDepth
+        elif tok.kind == tkRParen:
+          dec lineDepth
       result.add(il)
       parenDepth = lineDepth
 
 # ------------------------------------------------------------- Parser
 
-type
-  Parser = object
-    lines: seq[IndentedLine]
-    lineIdx: int
-    tokIdx: int
+type Parser = object
+  lines: seq[IndentedLine]
+  lineIdx: int
+  tokIdx: int
 
 proc isAtEof(p: Parser): bool =
   p.lineIdx >= p.lines.len
@@ -319,7 +432,8 @@ proc currTok(p: Parser): Token =
   return Token(kind: tkEof)
 
 proc peekTok(p: Parser, offset: int = 1): Token =
-  if p.isAtEof(): return Token(kind: tkEof)
+  if p.isAtEof():
+    return Token(kind: tkEof)
   let line = p.lines[p.lineIdx]
   let idx = p.tokIdx + offset
   if idx < line.tokens.len:
@@ -335,7 +449,8 @@ proc nextLine(p: var Parser) =
   p.tokIdx = 0
 
 proc currIndent(p: Parser): int =
-  if p.isAtEof(): return -1
+  if p.isAtEof():
+    return -1
   return p.lines[p.lineIdx].indent
 
 # Precedence levels for binary operators
@@ -379,7 +494,6 @@ proc parsePrimary(p: var Parser): Expr =
   of tkNumber:
     p.advanceTok()
     return Expr(kind: ekNum, numVal: tok.numVal, isInt: tok.isInt, intVal: tok.intVal)
-
   of tkIdent, kwTrue, kwFalse:
     var name = tok.strVal
     p.advanceTok()
@@ -402,14 +516,12 @@ proc parsePrimary(p: var Parser): Expr =
       return Expr(kind: ekCall, callee: name, args: args)
     else:
       return Expr(kind: ekSym, symName: name)
-
   of tkLParen:
     p.advanceTok() # Consume '('
     let inner = p.parseExpr(0)
     if p.currTok().kind == tkRParen:
       p.advanceTok() # Consume ')'
     return inner
-
   of kwIf:
     p.advanceTok() # Consume 'if'
     let cond = p.parseExpr(0)
@@ -423,7 +535,6 @@ proc parsePrimary(p: var Parser): Expr =
         p.advanceTok() # Consume ':'
       elseExpr = p.parseExpr(0)
     return Expr(kind: ekIf, ifCond: cond, ifThen: thenExpr, ifElse: elseExpr)
-
   else:
     # Unexpected or empty; return 0.0 fallback
     p.advanceTok()
@@ -460,34 +571,63 @@ proc parseExpr(p: var Parser, minPrec: int = 0): Expr =
   return left
 
 # Evaluate constant expressions at compile-time for initializers
-proc evalConstExpr*(expr: Expr, samplerate: float = 48000.0, knownVars: Table[string, float] = initTable[string, float]()): float =
-  if expr == nil: return 0.0
+proc evalConstExpr*(
+    expr: Expr,
+    samplerate: float = 48000.0,
+    knownVars: Table[string, float] = initTable[string, float](),
+): float =
+  if expr == nil:
+    return 0.0
   case expr.kind
   of ekNum:
     return expr.numVal
   of ekSym:
-    if expr.symName == "samplerate": return samplerate
-    elif expr.symName.toUpperAscii() == "TWOPI": return 6.283185307179586
-    elif expr.symName.toUpperAscii() == "PI": return 3.141592653589793
-    elif expr.symName in knownVars: return knownVars[expr.symName]
-    else: return 0.0
+    if expr.symName == "samplerate":
+      return samplerate
+    elif expr.symName.toUpperAscii() == "TWOPI":
+      return 6.283185307179586
+    elif expr.symName.toUpperAscii() == "PI":
+      return 3.141592653589793
+    elif expr.symName in knownVars:
+      return knownVars[expr.symName]
+    else:
+      return 0.0
   of ekUnary:
     let v = evalConstExpr(expr.uexpr, samplerate, knownVars)
-    if expr.uop == "-": return -v
-    else: return v
+    if expr.uop == "-":
+      return -v
+    else:
+      return v
   of ekBinary:
     let l = evalConstExpr(expr.lhs, samplerate, knownVars)
     let r = evalConstExpr(expr.rhs, samplerate, knownVars)
     case expr.bop
-    of "+": return l + r
-    of "-": return l - r
-    of "*": return l * r
-    of "/": return if r != 0.0: l / r else: 0.0
-    of "%": return if r != 0.0: (let divVal = floor(l / r); l - divVal * r) else: 0.0
-    of "&": return float(int64(l) and int64(r))
-    of "|": return float(int64(l) or int64(r))
-    of "^", "xor": return float(int64(l) xor int64(r))
-    else: return 0.0
+    of "+":
+      return l + r
+    of "-":
+      return l - r
+    of "*":
+      return l * r
+    of "/":
+      return
+        if r != 0.0:
+          l / r
+        else:
+          0.0
+    of "%":
+      return
+        if r != 0.0:
+          (let divVal = floor(l / r); l - divVal * r)
+        else:
+          0.0
+    of "&":
+      return float(int64(l) and int64(r))
+    of "|":
+      return float(int64(l) or int64(r))
+    of "^", "xor":
+      return float(int64(l) xor int64(r))
+    else:
+      return 0.0
   of ekCall:
     if expr.callee == "trunc" and expr.args.len >= 1:
       return float(int(evalConstExpr(expr.args[0], samplerate, knownVars)))
@@ -541,7 +681,13 @@ proc parseStatementLine(p: var Parser, parentIndent: int): Stmt =
       else:
         break
 
-    return Stmt(kind: skIf, cond: cond, thenStmts: thenStmts, elifBranches: elifBranches, elseStmts: elseStmts)
+    return Stmt(
+      kind: skIf,
+      cond: cond,
+      thenStmts: thenStmts,
+      elifBranches: elifBranches,
+      elseStmts: elseStmts,
+    )
 
   # 2. while statement
   elif firstTok.kind == kwWhile:
@@ -555,7 +701,9 @@ proc parseStatementLine(p: var Parser, parentIndent: int): Stmt =
     return Stmt(kind: skWhile, whileCond: cond, whileStmts: stmts)
 
   # 3. Assignment: ident = expr (or +=, -=, *=, /=)
-  elif firstTok.kind == tkIdent and p.peekTok(1).kind in {tkAssign, tkPlusAssign, tkMinusAssign, tkStarAssign, tkSlashAssign}:
+  elif firstTok.kind == tkIdent and
+      p.peekTok(1).kind in
+      {tkAssign, tkPlusAssign, tkMinusAssign, tkStarAssign, tkSlashAssign}:
     let target = firstTok.strVal
     p.advanceTok() # Consume ident
     let opTok = p.currTok()
@@ -565,13 +713,21 @@ proc parseStatementLine(p: var Parser, parentIndent: int): Stmt =
 
     # Desugar compound assignments: target += expr -> target = target + (expr)
     if assignOp == "+=":
-      expr = Expr(kind: ekBinary, bop: "+", lhs: Expr(kind: ekSym, symName: target), rhs: expr)
+      expr = Expr(
+        kind: ekBinary, bop: "+", lhs: Expr(kind: ekSym, symName: target), rhs: expr
+      )
     elif assignOp == "-=":
-      expr = Expr(kind: ekBinary, bop: "-", lhs: Expr(kind: ekSym, symName: target), rhs: expr)
+      expr = Expr(
+        kind: ekBinary, bop: "-", lhs: Expr(kind: ekSym, symName: target), rhs: expr
+      )
     elif assignOp == "*=":
-      expr = Expr(kind: ekBinary, bop: "*", lhs: Expr(kind: ekSym, symName: target), rhs: expr)
+      expr = Expr(
+        kind: ekBinary, bop: "*", lhs: Expr(kind: ekSym, symName: target), rhs: expr
+      )
     elif assignOp == "/=":
-      expr = Expr(kind: ekBinary, bop: "/", lhs: Expr(kind: ekSym, symName: target), rhs: expr)
+      expr = Expr(
+        kind: ekBinary, bop: "/", lhs: Expr(kind: ekSym, symName: target), rhs: expr
+      )
 
     p.nextLine()
     return Stmt(kind: skAssign, target: target, assignOp: "=", val: expr)
@@ -599,12 +755,15 @@ proc parseParamDecl(line: string): OmniParam =
   let braceOpen = l.find('{')
   let braceClose = l.find('}')
   if braceOpen > 0 and braceClose > braceOpen:
-    p.name = l[0..<braceOpen].strip()
-    let inner = l[(braceOpen + 1)..<braceClose].split(',')
+    p.name = l[0 ..< braceOpen].strip()
+    let inner = l[(braceOpen + 1) ..< braceClose].split(',')
     var v = 0.0
-    if inner.len >= 1 and parseFloat(inner[0].strip(), v) > 0: p.defaultVal = v
-    if inner.len >= 2 and parseFloat(inner[1].strip(), v) > 0: p.minVal = v
-    if inner.len >= 3 and parseFloat(inner[2].strip(), v) > 0: p.maxVal = v
+    if inner.len >= 1 and parseFloat(inner[0].strip(), v) > 0:
+      p.defaultVal = v
+    if inner.len >= 2 and parseFloat(inner[1].strip(), v) > 0:
+      p.minVal = v
+    if inner.len >= 3 and parseFloat(inner[2].strip(), v) > 0:
+      p.maxVal = v
   else:
     p.name = l
   return p
@@ -637,19 +796,20 @@ proc parseOmniText*(text: string, moduleName: string = "OmniModule"): OmniModule
           if p.currTok().kind == tkIdent:
             result.inputs.add(p.currTok().strVal)
           p.nextLine()
-
       of kwOuts:
         while not p.isAtEof() and p.currIndent() > headerIndent:
           if p.currTok().kind == tkIdent:
             result.outputs.add(p.currTok().strVal)
           p.nextLine()
-
       of kwParams:
         while not p.isAtEof() and p.currIndent() > headerIndent:
-          let rawLine = if p.lineIdx < rawLines.len: rawLines[p.lines[p.lineIdx].lineNum - 1] else: ""
+          let rawLine =
+            if p.lineIdx < rawLines.len:
+              rawLines[p.lines[p.lineIdx].lineNum - 1]
+            else:
+              ""
           result.params.add(parseParamDecl(rawLine))
           p.nextLine()
-
       of kwInit:
         while not p.isAtEof() and p.currIndent() > headerIndent:
           if p.currTok().kind == tkIdent and p.peekTok(1).kind == tkAssign:
@@ -659,15 +819,17 @@ proc parseOmniText*(text: string, moduleName: string = "OmniModule"): OmniModule
             let expr = p.parseExpr(0)
             let initVal = evalConstExpr(expr, 48000.0, knownInitVals)
             knownInitVals[varName] = initVal
-            result.stateVars.add(OmniStateVar(name: varName, initExpr: $initVal, initVal: initVal))
+            result.stateVars.add(
+              OmniStateVar(name: varName, initExpr: $initVal, initVal: initVal)
+            )
           p.nextLine()
-
       of kwPerform:
         # Check if perform contains sample block
         while not p.isAtEof() and p.currIndent() > headerIndent:
           if p.currTok().kind == kwSample:
             p.advanceTok()
-            if p.currTok().kind == tkColon: p.advanceTok()
+            if p.currTok().kind == tkColon:
+              p.advanceTok()
             let sampleIndent = p.lines[p.lineIdx].indent
             p.nextLine()
             let sStmts = p.parseBlock(sampleIndent)
@@ -676,11 +838,9 @@ proc parseOmniText*(text: string, moduleName: string = "OmniModule"): OmniModule
             let stmt = p.parseStatementLine(headerIndent)
             if stmt != nil:
               result.performStmts.add(stmt)
-
       of kwSample:
         let sStmts = p.parseBlock(headerIndent)
         result.sampleStmts.add(sStmts)
-
       else:
         p.nextLine()
     else:
@@ -688,7 +848,8 @@ proc parseOmniText*(text: string, moduleName: string = "OmniModule"): OmniModule
 
   # Auto-discover in* and out* symbols from statements if not explicitly declared in sections
   proc collectUsedSymbols(expr: Expr, syms: var seq[string]) =
-    if expr == nil: return
+    if expr == nil:
+      return
     case expr.kind
     of ekSym:
       syms.add(expr.symName)
@@ -698,7 +859,8 @@ proc parseOmniText*(text: string, moduleName: string = "OmniModule"): OmniModule
       collectUsedSymbols(expr.lhs, syms)
       collectUsedSymbols(expr.rhs, syms)
     of ekCall:
-      for a in expr.args: collectUsedSymbols(a, syms)
+      for a in expr.args:
+        collectUsedSymbols(a, syms)
     of ekIf:
       collectUsedSymbols(expr.ifCond, syms)
       collectUsedSymbols(expr.ifThen, syms)
@@ -708,33 +870,42 @@ proc parseOmniText*(text: string, moduleName: string = "OmniModule"): OmniModule
       discard
 
   proc collectStmtSymbols(stmt: Stmt, syms: var seq[string]) =
-    if stmt == nil: return
+    if stmt == nil:
+      return
     case stmt.kind
     of skAssign:
       syms.add(stmt.target)
       collectUsedSymbols(stmt.val, syms)
     of skIf:
       collectUsedSymbols(stmt.cond, syms)
-      for s in stmt.thenStmts: collectStmtSymbols(s, syms)
+      for s in stmt.thenStmts:
+        collectStmtSymbols(s, syms)
       for b in stmt.elifBranches:
         collectUsedSymbols(b.cond, syms)
-        for s in b.stmts: collectStmtSymbols(s, syms)
-      for s in stmt.elseStmts: collectStmtSymbols(s, syms)
+        for s in b.stmts:
+          collectStmtSymbols(s, syms)
+      for s in stmt.elseStmts:
+        collectStmtSymbols(s, syms)
     of skWhile:
       collectUsedSymbols(stmt.whileCond, syms)
-      for s in stmt.whileStmts: collectStmtSymbols(s, syms)
+      for s in stmt.whileStmts:
+        collectStmtSymbols(s, syms)
     of skExpr:
       collectUsedSymbols(stmt.callExpr, syms)
 
   var allSyms: seq[string] = @[]
-  for s in result.performStmts: collectStmtSymbols(s, allSyms)
-  for s in result.sampleStmts: collectStmtSymbols(s, allSyms)
+  for s in result.performStmts:
+    collectStmtSymbols(s, allSyms)
+  for s in result.sampleStmts:
+    collectStmtSymbols(s, allSyms)
 
   for sym in allSyms:
-    if (sym.startsWith("in") or sym.startsWith("In")) and sym.len >= 3 and sym[2] in {'0'..'9'}:
+    if (sym.startsWith("in") or sym.startsWith("In")) and sym.len >= 3 and
+        sym[2] in {'0' .. '9'}:
       if sym notin result.inputs:
         result.inputs.add(sym)
-    elif (sym.startsWith("out") or sym.startsWith("Out")) and sym.len >= 4 and sym[3] in {'0'..'9'}:
+    elif (sym.startsWith("out") or sym.startsWith("Out")) and sym.len >= 4 and
+        sym[3] in {'0' .. '9'}:
       if sym notin result.outputs:
         result.outputs.add(sym)
 
@@ -754,18 +925,21 @@ proc parseOmniFile*(path: string): OmniModule =
   return parseOmniText(content, name)
 
 proc collectAssignTargets*(stmt: Stmt, targets: var seq[string]) =
-  if stmt == nil: return
+  if stmt == nil:
+    return
   case stmt.kind
   of skAssign:
     targets.add(stmt.target)
   of skIf:
-    for s in stmt.thenStmts: collectAssignTargets(s, targets)
+    for s in stmt.thenStmts:
+      collectAssignTargets(s, targets)
     for b in stmt.elifBranches:
-      for s in b.stmts: collectAssignTargets(s, targets)
-    for s in stmt.elseStmts: collectAssignTargets(s, targets)
+      for s in b.stmts:
+        collectAssignTargets(s, targets)
+    for s in stmt.elseStmts:
+      collectAssignTargets(s, targets)
   of skWhile:
-    for s in stmt.whileStmts: collectAssignTargets(s, targets)
+    for s in stmt.whileStmts:
+      collectAssignTargets(s, targets)
   of skExpr:
     discard
-
-

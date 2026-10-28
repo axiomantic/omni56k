@@ -1,92 +1,68 @@
-name: ci
-
+name: CI
 on:
   push:
-    paths-ignore:
-      - '*.md'
+    branches: [main]
   pull_request:
-    paths-ignore:
-      - '*.md'
-  workflow_dispatch:
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
-defaults:
-  run:
-    shell: bash
+permissions: {}
 
 jobs:
-  test:
-    name: 'Test (Nim ${{ matrix.nim-version }}, ${{ matrix.os }})'
+  secrets-scan:
+    name: Secrets Scan
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Install and run Gitleaks
+        run: |
+          curl -sSL "https://github.com/gitleaks/gitleaks/releases/download/v8.24.0/gitleaks_8.24.0_linux_x64.tar.gz" | sudo tar -xz -C /usr/local/bin gitleaks
+          gitleaks detect --verbose --redact
+
+  test-nim:
+    name: Nim (${{ matrix.nim-version }}, ${{ matrix.os }})
     runs-on: ${{ matrix.os }}
-    continue-on-error: ${{ matrix.experimental || false }}
+    permissions:
+      contents: read
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - os: ubuntu-latest
-            nim-version: '1.6.20'
-          - os: ubuntu-latest
-            nim-version: '2.0.14'
-          - os: ubuntu-latest
-            nim-version: '2.2.12'
-          - os: ubuntu-latest
-            nim-version: 'devel'
-            experimental: true
-          - os: macos-latest
-            nim-version: '2.2.12'
-
+        os: [ubuntu-latest]
+        nim-version: [stable, "2.2.6", devel]
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+
+      - uses: jiro4989/setup-nim-action@v2
+        with:
+          nim-version: ${{ matrix.nim-version }}
+          parent-nim-install-directory: ${{ runner.temp }}
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/cache@v5
+        with:
+          path: ~/.nimble
+          key: nimble-${{ runner.os }}-${{ hashFiles('**/*.nimble') }}
 
       - name: Checkout dsp56300-nim dependency
         run: |
           git clone --depth 1 https://github.com/elijahr/dsp56300-nim.git ../dsp56300-nim
 
-      - name: Setup Nim via vfox-nim
-        uses: elijahr/vfox-nim@main
-        with:
-          version: ${{ matrix.nim-version }}
-
-      - name: Cache vfox toolchains
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.version-fox/cache/nim
-            ~/.vfox/cache/nim
-          key: vfox-${{ runner.os }}-${{ matrix.nim-version }}-${{ hashFiles('omni56k.nimble') }}
-          restore-keys: |
-            vfox-${{ runner.os }}-${{ matrix.nim-version }}-
-            vfox-${{ runner.os }}-
-
-      - name: Cache Nimble packages
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.nimble/pkgs2
-            ~/.nimble/pkgs
-            ~/.nimble/bin
-          key: nimble-${{ runner.os }}-${{ matrix.nim-version }}-${{ hashFiles('omni56k.nimble') }}
-          restore-keys: |
-            nimble-${{ runner.os }}-${{ matrix.nim-version }}-
-            nimble-${{ runner.os }}-
-
       - name: Install dependencies
         run: |
-          export PATH="$HOME/.nimble/bin:$PATH"
-          nimble install -Y cligen
+          nimble install --depsOnly -y
 
-      - name: Build CLI binaries
+      - name: nph format check
         run: |
-          export PATH="$HOME/.nimble/bin:$PATH"
-          nimble build -Y
-          ./omni56k --help
-          ./omnidsp --help
+          nimble install -y nph@0.7.0
+          nph --check .
+        continue-on-error: ${{ matrix.nim-version == 'devel' }}
 
-      - name: Run test suite
-        run: |
-          export PATH="$HOME/.nimble/bin:$PATH"
-          nimble test
+      - name: nimble check
+        run: nimble check
+        continue-on-error: ${{ matrix.nim-version == 'devel' }}
+
+      - name: Test
+        run: nimble test
+        continue-on-error: ${{ matrix.nim-version == 'devel' }}
